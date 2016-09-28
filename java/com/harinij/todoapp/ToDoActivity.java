@@ -1,7 +1,9 @@
 package com.harinij.todoapp;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -35,10 +37,33 @@ public class ToDoActivity extends AppCompatActivity {
     }
 
     public void onAddItem(View v){
-        String newItem = ((EditText) findViewById(R.id.etNewItem)).getText().toString();
-        itemsAdapter.add(newItem);
-        ((EditText) findViewById(R.id.etNewItem)).setText("");
-        writeItems();
+        final String newItem = ((EditText) findViewById(R.id.etNewItem)).getText().toString();
+        if(newItem.length()==0){
+            AlertDialog.Builder dialog = new AlertDialog.Builder(ToDoActivity.this);
+            dialog.setMessage("The entered string is empty. Are you sure you want to save an empty to-do item?");
+            dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialogYes, int arg1){
+                    itemsAdapter.add(newItem);
+                    ((EditText) findViewById(R.id.etNewItem)).setText("");
+                    writeItems();
+                    return;
+                }
+            });
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogNo, int i) {
+                    (findViewById(R.id.etNewItem)).requestFocus();
+                    dialogNo.cancel();
+                }
+            });
+            AlertDialog dialogBox = dialog.create();
+            dialogBox.show();
+        }
+        else {
+            itemsAdapter.add(newItem);
+            ((EditText) findViewById(R.id.etNewItem)).setText("");
+            writeItems();
+        }
     }
 
     private void setupListViewListener(){
